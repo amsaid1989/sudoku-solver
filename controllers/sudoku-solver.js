@@ -1,24 +1,154 @@
 class SudokuSolver {
+    validate(puzzleString) {
+        const pattern = /^[\d\.]{81}$/;
 
-  validate(puzzleString) {
-  }
+        return pattern.test(puzzleString);
+    }
 
-  checkRowPlacement(puzzleString, row, column, value) {
+    getRowIndex(index) {
+        return Math.floor(index / 9);
+    }
 
-  }
+    getColIndex(index) {
+        return index % 9;
+    }
 
-  checkColPlacement(puzzleString, row, column, value) {
+    getRegionIndices(rowIndex, colIndex) {
+        return [Math.floor(rowIndex / 3), Math.floor(colIndex / 3)];
+    }
 
-  }
+    coordinateToIndices(coordinate) {
+        const allowedLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
 
-  checkRegionPlacement(puzzleString, row, column, value) {
+        if (
+            coordinate.length !== 2 ||
+            !allowedLetters.includes(coordinate[0].toUpperCase())
+        ) {
+            return "invalid coordinate";
+        }
 
-  }
+        const rowIndex = allowedLetters.indexOf(coordinate[0].toUpperCase());
+        const colIndex = Number(coordinate[1]) - 1;
 
-  solve(puzzleString) {
-    
-  }
+        return [rowIndex, colIndex];
+    }
+
+    splitRows(puzzleString) {
+        const arr = puzzleString.split("");
+
+        const rows = arr.reduce((out, cur, idx) => {
+            const index = this.getRowIndex(idx);
+
+            out[index] = out[index] ? [...out[index], cur] : [cur];
+
+            return out;
+        }, []);
+
+        return rows;
+    }
+
+    splitColumns(puzzleString) {
+        const arr = puzzleString.split("");
+
+        const columns = arr.reduce((out, cur, idx) => {
+            const index = this.getColIndex(idx);
+
+            out[index] = out[index] ? [...out[index], cur] : [cur];
+
+            return out;
+        }, []);
+
+        return columns;
+    }
+
+    splitRegions(puzzleString) {
+        const arr = puzzleString.split("");
+
+        const base = [
+            [[], [], []],
+            [[], [], []],
+            [[], [], []],
+        ];
+
+        const regions = arr.reduce((out, cur, idx) => {
+            const region = this.getRegionIndices(
+                this.getRowIndex(idx),
+                this.getColIndex(idx)
+            );
+
+            out[region[0]][region[1]] = [...out[region[0]][region[1]], cur];
+
+            return out;
+        }, base);
+
+        return regions;
+    }
+
+    checkRowPlacement(puzzleString, rowIndex, value) {
+        const row = this.splitRows(puzzleString)[rowIndex];
+
+        return !row.includes(value);
+    }
+
+    checkColPlacement(puzzleString, colIndex, value) {
+        const col = this.splitColumns(puzzleString)[colIndex];
+
+        return !col.includes(value);
+    }
+
+    checkRegionPlacement(puzzleString, rowIndex, colIndex, value) {
+        const regionIndices = this.getRegionIndices(rowIndex, colIndex);
+        const region = this.splitRegions(puzzleString)[regionIndices[0]][
+            regionIndices[1]
+        ];
+
+        return !region.includes(value);
+    }
+
+    solve(puzzleString) {
+        if (!this.validate(puzzleString)) {
+            return "invalid puzzle string";
+        }
+
+        if (!puzzleString.includes(".")) {
+            return puzzleString;
+        }
+
+        let resultString = puzzleString;
+
+        let possibleSolutions = {};
+
+        for (let idx = 0; idx < resultString.length; idx++) {
+            if (resultString[idx] === ".") {
+                const rowIndex = this.getRowIndex(idx);
+                const colIndex = this.getColIndex(idx);
+
+                const digits = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+
+                possibleSolutions[idx] = digits.filter((digit) => {
+                    return (
+                        this.checkRowPlacement(resultString, rowIndex, digit) &&
+                        this.checkColPlacement(resultString, colIndex, digit) &&
+                        this.checkRegionPlacement(
+                            resultString,
+                            rowIndex,
+                            colIndex,
+                            digit
+                        )
+                    );
+                });
+
+                if (possibleSolutions[idx].length === 1) {
+                    resultString =
+                        resultString.slice(0, idx) +
+                        possibleSolutions[idx][0] +
+                        resultString.slice(idx + 1);
+                }
+            }
+        }
+
+        return this.solve(resultString);
+    }
 }
 
 module.exports = SudokuSolver;
-
