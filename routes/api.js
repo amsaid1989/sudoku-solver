@@ -11,7 +11,6 @@ module.exports = function (app) {
         const value = req.body.value;
 
         if (puzzle && coordinate && value) {
-            console.log(value);
             const indices = solver.coordinateToIndices(coordinate);
             const row = solver.splitRows(puzzle)[indices[0]];
 
@@ -21,7 +20,7 @@ module.exports = function (app) {
                 res.json({ error: "Invalid characters in puzzle" });
             } else if (indices === "invalid coordinate") {
                 res.json({ error: "Invalid coordinate" });
-            } else if (value < 1 || value > 9) {
+            } else if (!/\d/.test(value)) {
                 res.json({ error: "Invalid value" });
             } else {
                 const rowCheck = solver.checkRowPlacement(
