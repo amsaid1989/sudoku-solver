@@ -20,7 +20,7 @@ module.exports = function (app) {
                 res.json({ error: "Invalid characters in puzzle" });
             } else if (indices === "invalid coordinate") {
                 res.json({ error: "Invalid coordinate" });
-            } else if (!/\d/.test(value)) {
+            } else if (!/\d/.test(value) || value < 1 || value > 9) {
                 res.json({ error: "Invalid value" });
             } else {
                 const rowCheck = solver.checkRowPlacement(
