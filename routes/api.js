@@ -11,6 +11,7 @@ module.exports = function (app) {
         const value = req.body.value;
 
         if (puzzle && coordinate && value) {
+            console.log(value);
             const indices = solver.coordinateToIndices(coordinate);
             const row = solver.splitRows(puzzle)[indices[0]];
 
