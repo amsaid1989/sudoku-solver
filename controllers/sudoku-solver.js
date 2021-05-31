@@ -84,6 +84,14 @@ class SudokuSolver {
         return regions;
     }
 
+    check(puzzleString, rowIndex, colIndex, value) {
+        return (
+            this.checkRowPlacement(puzzleString, rowIndex, value) &&
+            this.checkColPlacement(puzzleString, colIndex, value) &&
+            this.checkRegionPlacement(puzzleString, rowIndex, colIndex, value)
+        );
+    }
+
     checkRowPlacement(puzzleString, rowIndex, value) {
         const row = this.splitRows(puzzleString)[rowIndex];
 
@@ -106,7 +114,9 @@ class SudokuSolver {
     }
 
     solve(puzzleString) {
-        if (!this.validate(puzzleString)) {
+        if (puzzleString.length !== 81) {
+            return "puzzle should be 81 characters";
+        } else if (!this.validate(puzzleString)) {
             return "invalid puzzle string";
         }
 
@@ -126,16 +136,7 @@ class SudokuSolver {
                 const digits = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
                 possibleSolutions[idx] = digits.filter((digit) => {
-                    return (
-                        this.checkRowPlacement(resultString, rowIndex, digit) &&
-                        this.checkColPlacement(resultString, colIndex, digit) &&
-                        this.checkRegionPlacement(
-                            resultString,
-                            rowIndex,
-                            colIndex,
-                            digit
-                        )
-                    );
+                    return this.check(resultString, rowIndex, colIndex, digit);
                 });
 
                 if (possibleSolutions[idx].length === 1) {
@@ -143,6 +144,8 @@ class SudokuSolver {
                         resultString.slice(0, idx) +
                         possibleSolutions[idx][0] +
                         resultString.slice(idx + 1);
+                } else if (possibleSolutions[idx].length === 0) {
+                    return "puzzle can't be solved";
                 }
             }
         }

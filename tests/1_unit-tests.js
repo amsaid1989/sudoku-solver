@@ -152,13 +152,13 @@ suite("UnitTests", function () {
                     solver.solve(
                         "78156356.6781574264514.656329.42.13220526.25739472287559.486754276142.739720199476.804.406"
                     ),
-                    "invalid puzzle string"
+                    "puzzle should be 81 characters"
                 );
                 assert.equal(
                     solver.solve(
                         "7426912276141769630.686367338602799902541089.2974.2150071872032.842959"
                     ),
-                    "invalid puzzle string"
+                    "puzzle should be 81 characters"
                 );
             });
 
